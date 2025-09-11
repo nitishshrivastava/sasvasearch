@@ -155,96 +155,11 @@ VERTEXAI_VISIBLE_MODEL_NAMES = [
 ]
 
 
-OLLAMA_PROVIDER_NAME = "ollama"
-OLLAMA_DEFAULT_MODEL = "llama3.2"
-OLLAMA_DEFAULT_FAST_MODEL = "llama3.2:1b"
-OLLAMA_MODEL_NAMES = [
-    # Llama models
-    "llama3.3:70b",
-    "llama3.2:90b",
-    "llama3.2:vision",
-    "llama3.2",
-    "llama3.2:3b",
-    "llama3.2:1b",
-    "llama3.1:405b",
-    "llama3.1:70b",
-    "llama3.1:8b",
-    "llama3:70b",
-    "llama3:8b",
-    "llama2:70b",
-    "llama2:13b",
-    "llama2:7b",
-    # Mistral models
-    "mistral:7b",
-    "mistral-large",
-    "mixtral:8x7b",
-    "mixtral:8x22b",
-    # Google models
-    "gemma2:27b",
-    "gemma2:9b",
-    "gemma2:2b",
-    "gemma:7b",
-    "gemma:2b",
-    # Qwen models
-    "qwen2.5:72b",
-    "qwen2.5:32b",
-    "qwen2.5:14b",
-    "qwen2.5:7b",
-    "qwen2.5:3b",
-    "qwen2.5:1.5b",
-    "qwen2.5:0.5b",
-    "qwen2:72b",
-    "qwen2:7b",
-    "qwen2:1.5b",
-    "qwen2:0.5b",
-    # DeepSeek models
-    "deepseek-v2.5",
-    "deepseek-v2:16b",
-    "deepseek-coder-v2",
-    # Phi models
-    "phi3:14b",
-    "phi3:medium",
-    "phi3:mini",
-    # Other popular models
-    "command-r-plus",
-    "command-r",
-    "solar:10.7b",
-    "yi:34b",
-    "yi:9b",
-    "yi:6b",
-    "vicuna:33b",
-    "vicuna:13b",
-    "vicuna:7b",
-    "orca2:13b",
-    "orca2:7b",
-    "neural-chat:7b",
-    "starling-lm:7b",
-    "codellama:70b",
-    "codellama:34b",
-    "codellama:13b",
-    "codellama:7b",
-    "codegemma",
-    "starcoder2:15b",
-    "starcoder2:7b",
-    "starcoder2:3b",
-]
-OLLAMA_VISIBLE_MODEL_NAMES = [
-    "llama3.2",
-    "llama3.2:1b",
-    "mistral:7b",
-    "gemma2:9b",
-    "qwen2.5:7b",
-    "phi3:mini",
-]
-
-
-
 _PROVIDER_TO_MODELS_MAP = {
     OPENAI_PROVIDER_NAME: OPEN_AI_MODEL_NAMES,
     BEDROCK_PROVIDER_NAME: BEDROCK_MODEL_NAMES,
     ANTHROPIC_PROVIDER_NAME: ANTHROPIC_MODEL_NAMES,
     VERTEXAI_PROVIDER_NAME: VERTEXAI_MODEL_NAMES,
-    OLLAMA_PROVIDER_NAME: OLLAMA_MODEL_NAMES,
 }
 
 _PROVIDER_TO_VISIBLE_MODELS_MAP = {
@@ -252,7 +167,6 @@ _PROVIDER_TO_VISIBLE_MODELS_MAP = {
     BEDROCK_PROVIDER_NAME: [BEDROCK_DEFAULT_MODEL],
     ANTHROPIC_PROVIDER_NAME: ANTHROPIC_VISIBLE_MODEL_NAMES,
     VERTEXAI_PROVIDER_NAME: VERTEXAI_VISIBLE_MODEL_NAMES,
-    OLLAMA_PROVIDER_NAME: OLLAMA_VISIBLE_MODEL_NAMES,
 }
 
 
@@ -368,34 +282,6 @@ def fetch_available_well_known_llms() -> list[WellKnownLLMProviderDescriptor]:
             ],
             default_model=VERTEXAI_DEFAULT_MODEL,
             default_fast_model=VERTEXAI_DEFAULT_MODEL,
-        ),
-        WellKnownLLMProviderDescriptor(
-            name=OLLAMA_PROVIDER_NAME,
-            display_name="Ollama (Local)",
-            api_key_required=False,
-            api_base_required=False,
-            api_version_required=False,
-            custom_config_keys=[
-                CustomConfigKey(
-                    name="OLLAMA_BASE_URL",
-                    display_name="Ollama Base URL",
-                    description="URL where Ollama is running (e.g., http://localhost:11434)",
-                    is_required=False,
-                    default_value="http://localhost:11434",
-                ),
-                CustomConfigKey(
-                    name="OLLAMA_NUM_CTX",
-                    display_name="Context Window Size",
-                    description="Maximum context window size (default: 32768)",
-                    is_required=False,
-                    default_value="32768",
-                ),
-            ],
-            model_configurations=fetch_model_configurations_for_provider(
-                OLLAMA_PROVIDER_NAME
-            ),
-            default_model=OLLAMA_DEFAULT_MODEL,
-            default_fast_model=OLLAMA_DEFAULT_FAST_MODEL,
         ),
     ]
 
