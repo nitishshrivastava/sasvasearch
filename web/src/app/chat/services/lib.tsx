@@ -176,6 +176,7 @@ export interface SendMessageParams {
   userFileIds?: number[];
   userFolderIds?: number[];
   useAgentSearch?: boolean;
+  useDeepAgent?: boolean;
   enabledToolIds?: number[];
   forcedToolIds?: number[];
 }
@@ -200,6 +201,7 @@ export async function* sendMessage({
   alternateAssistantId,
   signal,
   useAgentSearch,
+  useDeepAgent,
   enabledToolIds,
   forcedToolIds,
 }: SendMessageParams): AsyncGenerator<PacketType, void, unknown> {
@@ -242,6 +244,7 @@ export async function* sendMessage({
         : null,
     use_existing_user_message: useExistingUserMessage,
     use_agentic_search: useAgentSearch ?? false,
+    use_deep_agent: useDeepAgent ?? false,
     allowed_tool_ids: enabledToolIds,
     forced_tool_ids: forcedToolIds,
   });

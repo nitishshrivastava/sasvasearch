@@ -301,6 +301,7 @@ export function useChatController({
       selectedFolders,
       currentMessageFiles,
       useAgentSearch,
+      useDeepAgent,
       messageIdToResend,
       queryOverride,
       forceSearch,
@@ -316,6 +317,7 @@ export function useChatController({
       // from the chat bar???
       currentMessageFiles: FileDescriptor[];
       useAgentSearch: boolean;
+      useDeepAgent?: boolean;
 
       // optional params
       messageIdToResend?: number;
@@ -590,6 +592,7 @@ export function useChatController({
             searchParams?.get(SEARCH_PARAM_NAMES.SYSTEM_PROMPT) || undefined,
           useExistingUserMessage: isSeededChat,
           useAgentSearch,
+          useDeepAgent,
           enabledToolIds:
             disabledToolIds && liveAssistant
               ? liveAssistant.tools

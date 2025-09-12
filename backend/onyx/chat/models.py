@@ -363,3 +363,5 @@ class ChatBasicResponse(BaseModel):
     message_id: int
     # this is a map of the citation number to the document id
     cited_documents: dict[int, str]
+    # Indicates if deep-agent was used for this response
+    used_deep_agent: bool = False

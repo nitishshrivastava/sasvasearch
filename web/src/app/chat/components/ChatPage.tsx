@@ -86,6 +86,7 @@ import { FederatedOAuthModal } from "@/components/chat/FederatedOAuthModal";
 import { AssistantIcon } from "@/components/assistants/AssistantIcon";
 import { StarterMessageDisplay } from "./starterMessages/StarterMessageDisplay";
 import { MessagesDisplay } from "./MessagesDisplay";
+import { useDeepAgentToggle } from "../hooks/useDeepAgentToggle";
 
 export function ChatPage({
   toggle,
@@ -201,6 +202,7 @@ export function ChatPage({
         selectedFolders,
         currentMessageFiles,
         useAgentSearch: deepResearchEnabled,
+        useDeepAgent: deepAgentEnabled,
       });
     }
   };
@@ -211,6 +213,11 @@ export function ChatPage({
     });
 
   const { deepResearchEnabled, toggleDeepResearch } = useDeepResearchToggle({
+    chatSessionId: existingChatSessionId,
+    assistantId: selectedAssistant?.id,
+  });
+  
+  const { deepAgentEnabled, toggleDeepAgent } = useDeepAgentToggle({
     chatSessionId: existingChatSessionId,
     assistantId: selectedAssistant?.id,
   });
@@ -732,6 +739,7 @@ export function ChatPage({
     selectedFolders,
     currentMessageFiles,
     deepResearchEnabled,
+    deepAgentEnabled,
   ]);
 
   // Memoized callbacks for Header
@@ -1181,6 +1189,8 @@ export function ChatPage({
                               <ChatInputBar
                                 deepResearchEnabled={deepResearchEnabled}
                                 toggleDeepResearch={toggleDeepResearch}
+                                deepAgentEnabled={deepAgentEnabled}
+                                toggleDeepAgent={toggleDeepAgent}
                                 toggleDocumentSidebar={toggleDocumentSidebar}
                                 filterManager={filterManager}
                                 llmManager={llmManager}

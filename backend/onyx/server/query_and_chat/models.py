@@ -146,6 +146,9 @@ class CreateChatMessageRequest(ChunkContext):
 
     # List of tool IDs we MUST use.
     forced_tool_ids: list[int] | None = None
+    
+    # Enable deep-agent mechanism for enhanced query processing
+    use_deep_agent: bool = False
 
     @model_validator(mode="after")
     def check_search_doc_ids_or_retrieval_options(self) -> "CreateChatMessageRequest":

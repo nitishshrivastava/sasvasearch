@@ -35,6 +35,7 @@ import { SettingsContext } from "@/components/settings/SettingsProvider";
 import { useDocumentsContext } from "@/app/chat/my-documents/DocumentsContext";
 import { UnconfiguredLlmProviderText } from "@/components/chat/UnconfiguredLlmProviderText";
 import { DeepResearchToggle } from "./DeepResearchToggle";
+import { DeepAgentToggle } from "./DeepAgentToggle";
 import { ActionToggle } from "./ActionManagement";
 import { SelectedTool } from "./SelectedTool";
 
@@ -110,6 +111,8 @@ interface ChatInputBarProps {
   retrievalEnabled: boolean;
   deepResearchEnabled: boolean;
   toggleDeepResearch: () => void;
+  deepAgentEnabled: boolean;
+  toggleDeepAgent: () => void;
   placeholder?: string;
 }
 
@@ -135,6 +138,8 @@ export const ChatInputBar = React.memo(function ChatInputBar({
   llmManager,
   deepResearchEnabled,
   toggleDeepResearch,
+  deepAgentEnabled,
+  toggleDeepAgent,
   placeholder,
 }: ChatInputBarProps) {
   const { user } = useUser();
@@ -628,6 +633,13 @@ export const ChatInputBar = React.memo(function ChatInputBar({
                     <DeepResearchToggle
                       deepResearchEnabled={deepResearchEnabled}
                       toggleDeepResearch={toggleDeepResearch}
+                    />
+                  )}
+                  
+                  {retrievalEnabled && (
+                    <DeepAgentToggle
+                      deepAgentEnabled={deepAgentEnabled}
+                      toggleDeepAgent={toggleDeepAgent}
                     />
                   )}
 

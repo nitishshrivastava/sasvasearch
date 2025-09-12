@@ -9,6 +9,7 @@ from typing import Protocol
 from sqlalchemy.orm import Session
 
 from onyx.agents.agent_search.orchestration.nodes.call_tool import ToolCallException
+from onyx.agents.deep_agent.integration import DeepAgentIntegration
 from onyx.chat.answer import Answer
 from onyx.chat.chat_utils import create_chat_chain
 from onyx.chat.chat_utils import create_temporary_persona
@@ -647,39 +648,80 @@ def stream_chat_message_objects(
         )
 
         # LLM prompt building, response capturing, etc.
-        answer = Answer(
-            prompt_builder=prompt_builder,
-            is_connected=is_connected,
-            latest_query_files=latest_query_files,
-            answer_style_config=answer_style_config,
-            llm=(
-                llm
-                or get_main_llm_from_tuple(
-                    get_llms_for_persona(
-                        persona=persona,
-                        llm_override=(
-                            new_msg_req.llm_override or chat_session.llm_override
-                        ),
-                        additional_headers=litellm_additional_headers,
+        # Check if deep-agent should be used
+        if new_msg_req.use_deep_agent:
+            # Use Deep Agent for processing
+            deep_agent_integration = DeepAgentIntegration(llm=llm, tools=tools)
+            
+            # Build context for deep agent
+            deep_agent_context = {
+                "persona": persona.name,
+                "persona_id": persona.id,
+                "message_history": [msg.model_dump() for msg in message_history],
+                "selected_docs": selected_db_search_docs,
+                "user_files": [f.model_dump() for f in latest_query_files] if latest_query_files else [],
+            }
+            
+            # Process with deep agent asynchronously
+            import asyncio
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            
+            try:
+                async def run_deep_agent():
+                    async for packet in deep_agent_integration.process_with_deep_agent(
+                        new_msg_req,
+                        deep_agent_context
+                    ):
+                        yield packet
+                
+                # Convert async generator to sync
+                gen = run_deep_agent()
+                while True:
+                    try:
+                        packet = loop.run_until_complete(gen.__anext__())
+                        yield packet
+                    except StopAsyncIteration:
+                        break
+                        
+            finally:
+                loop.close()
+                
+        else:
+            # Use standard answer flow
+            answer = Answer(
+                prompt_builder=prompt_builder,
+                is_connected=is_connected,
+                latest_query_files=latest_query_files,
+                answer_style_config=answer_style_config,
+                llm=(
+                    llm
+                    or get_main_llm_from_tuple(
+                        get_llms_for_persona(
+                            persona=persona,
+                            llm_override=(
+                                new_msg_req.llm_override or chat_session.llm_override
+                            ),
+                            additional_headers=litellm_additional_headers,
+                        )
                     )
-                )
-            ),
-            fast_llm=fast_llm,
-            force_use_tool=force_use_tool,
-            persona=persona,
-            rerank_settings=new_msg_req.rerank_settings,
-            chat_session_id=chat_session_id,
-            current_agent_message_id=reserved_message_id,
-            tools=tools,
-            db_session=db_session,
-            use_agentic_search=new_msg_req.use_agentic_search,
-            skip_gen_ai_answer_generation=new_msg_req.skip_gen_ai_answer_generation,
-        )
+                ),
+                fast_llm=fast_llm,
+                force_use_tool=force_use_tool,
+                persona=persona,
+                rerank_settings=new_msg_req.rerank_settings,
+                chat_session_id=chat_session_id,
+                current_agent_message_id=reserved_message_id,
+                tools=tools,
+                db_session=db_session,
+                use_agentic_search=new_msg_req.use_agentic_search,
+                skip_gen_ai_answer_generation=new_msg_req.skip_gen_ai_answer_generation,
+            )
 
-        # Process streamed packets using the new packet processing module
-        yield from process_streamed_packets(
-            answer_processed_output=answer.processed_streamed_output,
-        )
+            # Process streamed packets using the new packet processing module
+            yield from process_streamed_packets(
+                answer_processed_output=answer.processed_streamed_output,
+            )
 
     except ValueError as e:
         logger.exception("Failed to process chat message.")
